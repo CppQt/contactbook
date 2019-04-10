@@ -51,13 +51,30 @@ Window {
 
                 MouseArea {
                     anchors.fill: parent
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton
                     onClicked: {
-                        editRecordDialog.firstName = model.firstName
-                        editRecordDialog.lastName = model.lastName
-                        editRecordDialog.birthday = Qt.formatDate(model.birthday, Qt.DefaultLocaleShortDate)
-                        editRecordDialog.email = model.email
-                        editRecordDialog.model = model
-                        editRecordDialog.open()
+                        if (mouse.button === Qt.LeftButton) {
+                            editRecordDialog.firstName = model.firstName
+                            editRecordDialog.lastName = model.lastName
+                            editRecordDialog.birthday = Qt.formatDate(model.birthday, Qt.DefaultLocaleShortDate)
+                            editRecordDialog.email = model.email
+                            editRecordDialog.model = model
+                            editRecordDialog.open()
+                        } else if (mouse.button === Qt.RightButton) {
+                            contextMenu.popup()
+                        }
+                    }
+                }
+                Menu {
+                    id: contextMenu
+                    MenuItem {
+                        text: qsTr("Insert before")
+                    }
+                    MenuItem {
+                        text: qsTr("Insert after")
+                    }
+                    MenuItem {
+                        text: qsTr("Remove")
                     }
                 }
             }
