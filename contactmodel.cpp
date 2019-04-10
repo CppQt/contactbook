@@ -103,7 +103,7 @@ bool ContactModel::loadData(const QString &fileName)
         QString firstName = parts.at(0);
         QString lastName = parts.at(1);
         QString dateString = parts.at(2);
-        QDate date = QDate::fromString(dateString);
+        QDate date = QDate::fromString(dateString, Qt::ISODate);
         if (!date.isValid())
             continue;
         QString emailString = parts.at(3);
@@ -118,7 +118,22 @@ bool ContactModel::loadData(const QString &fileName)
     return true;
 }
 
-bool ContactModel::saveData(const QString &fileName)
+bool ContactModel::saveData(const QString &fileName, bool overwrite)
 {
+    if (!QFile::exists(fileName) && !overwrite)
+        return false;
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        return false;
+    }
+
+    QTextStream stream(&file);
+    for (const Record &record : qAsConst(contacts)) {
+        QString line = QStringLiteral("%1 %2 %3 %4 ")
+                .arg(record.firstName, record.lastName, record.birthday.toString(Qt::ISODate), record.email);
+        stream << line << QChar(QChar::LineFeed);
+    }
+
     return true;
 }

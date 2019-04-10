@@ -56,8 +56,8 @@ public:
     virtual QHash<int, QByteArray> roleNames() const override;
 
 
-    bool loadData(const QString &fileName);
-    bool saveData(const QString &fileName);
+    Q_INVOKABLE bool loadData(const QString &fileName);
+    Q_INVOKABLE bool saveData(const QString &fileName, bool overwrite = false);
 
 private:
     QVector<Record> contacts;
