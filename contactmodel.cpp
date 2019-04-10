@@ -150,3 +150,39 @@ bool ContactModel::saveData(const QString &fileName, bool overwrite)
 
     return true;
 }
+
+bool ContactModel::addRowBefore(int row, const QString &firstName, const QString &lastName, const QDate &birthday, const QString &email)
+{
+    if (row < 0 || row >= contacts.size()) {
+        return false;
+    }
+
+    beginInsertRows({}, row, row);
+    Record record(firstName, lastName, birthday, email);
+    contacts.insert(row, record);
+    endInsertRows();
+    return true;
+}
+
+bool ContactModel::addRowAfter(int row, const QString &firstName, const QString &lastName, const QDate &birthday, const QString &email)
+{
+    if (row < 0 || row >= contacts.size()) {
+        return false;
+    }
+    beginInsertRows({}, row + 1, row + 1);
+    Record record(firstName, lastName, birthday, email);
+    contacts.insert(row + 1, record);
+    endInsertRows();
+    return true;
+}
+
+bool ContactModel::removeRow(int row)
+{
+    if (row < 0 || row >= contacts.size()) {
+        return false;
+    }
+    beginRemoveRows({}, row, row);
+    contacts.remove(row);
+    endRemoveRows();
+    return true;
+}
