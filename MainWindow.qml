@@ -48,6 +48,18 @@ Window {
                         text: model.email
                     }
                 }
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        editRecordDialog.firstName = model.firstName
+                        editRecordDialog.lastName = model.lastName
+                        editRecordDialog.birthday = Qt.formatDate(model.birthday, Qt.DefaultLocaleShortDate)
+                        editRecordDialog.email = model.email
+                        editRecordDialog.model = model
+                        editRecordDialog.open()
+                    }
+                }
             }
         }
 
@@ -96,7 +108,7 @@ Window {
 
         folder: shortcuts.home
         onAccepted: {
-            var fileName = fileDialog.fileUrls[0].replace(/file:\/\//, "")
+            var fileName = fileDialog.fileUrls[0].replace(/^file:\/\//, "")
             console.log("Selected file:", fileName)
             if (fileName !== null && fileName !== "") {
                 if (fileDialog.selectExisting) {
@@ -119,5 +131,7 @@ Window {
 
     EditRecordDialog {
         id: editRecordDialog
+        width: 200
+        height: 100
     }
 }
