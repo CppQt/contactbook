@@ -75,6 +75,10 @@ Window {
                     }
                     MenuItem {
                         text: qsTr("Remove")
+                        onTriggered: {
+                            console.log("Removed row:", index)
+                            contactModel.removeRow(index)
+                        }
                     }
                 }
             }
