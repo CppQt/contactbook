@@ -54,6 +54,7 @@ Window {
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
                     onClicked: {
                         if (mouse.button === Qt.LeftButton) {
+                            editRecordDialog.resetFields()
                             editRecordDialog.firstName = model.firstName
                             editRecordDialog.lastName = model.lastName
                             editRecordDialog.birthday = Qt.formatDate(model.birthday, Qt.DefaultLocaleShortDate)
@@ -69,9 +70,21 @@ Window {
                     id: contextMenu
                     MenuItem {
                         text: qsTr("Insert before")
+                        onTriggered: {
+                            editRecordDialog.resetFields()
+                            editRecordDialog.isBefore = true
+                            editRecordDialog.row = index
+                            editRecordDialog.open()
+                        }
                     }
                     MenuItem {
                         text: qsTr("Insert after")
+                        onTriggered: {
+                            editRecordDialog.resetFields()
+                            editRecordDialog.isBefore = false
+                            editRecordDialog.row = index
+                            editRecordDialog.open()
+                        }
                     }
                     MenuItem {
                         text: qsTr("Remove")
@@ -154,5 +167,18 @@ Window {
         id: editRecordDialog
         width: 200
         height: 100
+
+        property bool isBefore: true
+        property int row: -1
+
+        onAccepted: {
+            if (!model) {
+                if (isBefore) {
+                    contactModel.addRowBefore(row, firstName, lastName, Date.fromLocaleDateString(Qt.locale(), birthday, Locale.ShortFormat), email)
+                } else {
+                    contactModel.addRowAfter(row, firstName, lastName, Date.fromLocaleDateString(Qt.locale(), birthday, Locale.ShortFormat), email)
+                }
+            }
+        }
     }
 }

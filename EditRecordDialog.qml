@@ -12,6 +12,13 @@ Dialog {
 
     property var model: null
 
+    function resetFields() {
+        firstName = ""
+        lastName = ""
+        birthday = ""
+        email = ""
+    }
+
     GridLayout {
         anchors.fill: parent
 
