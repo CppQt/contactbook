@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QRegularExpression>
+#include <QDebug>
 
 const QString EMAIL_VALIDATOR = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"
                                 "\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|"
@@ -83,6 +84,7 @@ QHash<int, QByteArray> ContactModel::roleNames() const
 
 bool ContactModel::loadData(const QString &fileName)
 {
+    qDebug() << "Open file:" << fileName;
     if (!QFile::exists(fileName))
         return false;
 
@@ -96,20 +98,27 @@ bool ContactModel::loadData(const QString &fileName)
     QTextStream stream(&file);
     QString line;
     while (stream.readLineInto(&line)) {
+        qDebug() << "Line:" << line;
         QStringList parts = line.split(QRegularExpression("\\s+"));
-        if (parts.size() < 4)
+        if (parts.size() < 4) {
+            qDebug() << "Not enough fields";
             continue;
+        }
 
         QString firstName = parts.at(0);
         QString lastName = parts.at(1);
         QString dateString = parts.at(2);
         QDate date = QDate::fromString(dateString, Qt::ISODate);
-        if (!date.isValid())
+        if (!date.isValid()) {
+            qDebug() << "Date is invalid" << dateString;
             continue;
+        }
         QString emailString = parts.at(3);
         QRegularExpression vRegExp(EMAIL_VALIDATOR);
-        if (!vRegExp.match(emailString).hasMatch())
+        if (!vRegExp.match(emailString).hasMatch()) {
+            qDebug() << "Email is invalid" << emailString;
             continue;
+        }
 
         Record record(firstName, lastName, date, emailString);
         contacts.append(record);
@@ -120,11 +129,15 @@ bool ContactModel::loadData(const QString &fileName)
 
 bool ContactModel::saveData(const QString &fileName, bool overwrite)
 {
-    if (!QFile::exists(fileName) && !overwrite)
+    qDebug() << "Save file:" << fileName;
+    if (QFile::exists(fileName) && !overwrite) {
+        qDebug() << "File exists and overwrite is forbidden";
         return false;
+    }
 
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qDebug() << "Error when open file for write";
         return false;
     }
 

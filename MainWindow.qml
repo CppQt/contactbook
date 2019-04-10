@@ -19,7 +19,7 @@ Window {
 
             delegate: Rectangle {
                 width: contactsView.width
-                height: 50
+                height: 30
 
                 RowLayout {
                     anchors.fill: parent
@@ -33,18 +33,18 @@ Window {
                     Label {
                         id: lastNameLabel
                         Layout.preferredWidth: 50
-                        text: model.lastname
+                        text: model.lastName
                     }
 
                     Label {
                         id: birthdayLabel
-                        Layout.preferredWidth: 50
-                        text: model.birthday.toString()
+                        Layout.preferredWidth: 100
+                        text: Qt.formatDate(model.birthday, Qt.DefaultLocaleShortDate)
                     }
 
                     Label {
                         id: emailLabel
-                        Layout.preferredWidth: 50
+                        Layout.preferredWidth: 100
                         text: model.email
                     }
                 }
@@ -96,8 +96,8 @@ Window {
 
         folder: shortcuts.home
         onAccepted: {
-            console.log("Selected file:", fileDialog.fileUrls)
-            var fileName = fileDialog.fileUrls[0]
+            var fileName = fileDialog.fileUrls[0].replace(/file:\/\//, "")
+            console.log("Selected file:", fileName)
             if (fileName !== null && fileName !== "") {
                 if (fileDialog.selectExisting) {
                     if (!contactModel.loadData(fileName)) {
