@@ -7,6 +7,27 @@
 class Record
 {
 public:
+    Record() {}
+    Record(const Record &other) :
+        firstName(other.firstName), lastName(other.lastName), birthday(other.birthday), email(other.email) {}
+    Record(Record &&other) :
+        firstName(std::move(other.firstName)), lastName(std::move(other.lastName)), birthday(std::move(other.birthday)), email(std::move(other.email)) {}
+    Record(const QString &firstName, const QString &lastName, const QDate &birthday, const QString &email) :
+        firstName(firstName), lastName(lastName), birthday(birthday), email(email) {}
+    Record &operator=(const Record &other) {
+        firstName = other.firstName;
+        lastName = other.lastName;
+        birthday = other.birthday;
+        email = other.email;
+        return *this;
+    }
+    Record &operator=(Record &&other) {
+        firstName = std::move(other.firstName);
+        lastName = std::move(other.lastName);
+        birthday = std::move(other.birthday);
+        email = std::move(other.email);
+        return *this;
+    }
     QString firstName;
     QString lastName;
     QDate birthday;
@@ -18,7 +39,8 @@ class ContactModel : public QAbstractListModel
     Q_OBJECT
 public:
     enum Roles {
-        FirstNameRole = Qt::UserRole,
+        UnknownRole = Qt::UserRole,
+        FirstNameRole,
         LastNameRole,
         BirthdayRole,
         EmailRole

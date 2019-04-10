@@ -1,5 +1,16 @@
 #include "contactmodel.h"
 
+#include <QFile>
+#include <QTextStream>
+#include <QRegularExpression>
+
+const QString EMAIL_VALIDATOR = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"
+                                "\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|"
+                                "\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+"
+                                "[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\\.){3}"
+                                "(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:"
+                                "(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])";
+
 ContactModel::ContactModel(QObject *parent) : QAbstractListModel(parent)
 {
 }
@@ -72,10 +83,42 @@ QHash<int, QByteArray> ContactModel::roleNames() const
 
 bool ContactModel::loadData(const QString &fileName)
 {
-    //
+    if (!QFile::exists(fileName))
+        return false;
+
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return false;
+    }
+
+    beginResetModel();
+    contacts.clear();
+    QTextStream stream(&file);
+    QString line;
+    while (stream.readLineInto(&line)) {
+        QStringList parts = line.split(QRegularExpression("\\s+"));
+        if (parts.size() < 4)
+            continue;
+
+        QString firstName = parts.at(0);
+        QString lastName = parts.at(1);
+        QString dateString = parts.at(2);
+        QDate date = QDate::fromString(dateString);
+        if (!date.isValid())
+            continue;
+        QString emailString = parts.at(3);
+        QRegularExpression vRegExp(EMAIL_VALIDATOR);
+        if (!vRegExp.match(emailString).hasMatch())
+            continue;
+
+        Record record(firstName, lastName, date, emailString);
+        contacts.append(record);
+    }
+    endResetModel();
+    return true;
 }
 
 bool ContactModel::saveData(const QString &fileName)
 {
-    //
+    return true;
 }
