@@ -9,47 +9,69 @@ Window {
 
     property bool loading: false
 
-    ColumnLayout {
+    RowLayout {
         anchors.fill: parent
-
+        visible: loading
+        Item {
+            Layout.fillWidth: true
+        }
         ColumnLayout {
-            id: loader
-            visible: loading
-
+            Layout.fillWidth: true
             Item {
                 Layout.fillHeight: true
             }
 
             Label {
                 text: qsTr("Loading...")
+                Layout.alignment: Qt.AlignHCenter
             }
 
-            ProgressBar {
-                id: progressBar
-                from: 0
-                to: 100
+            Item {
+                id: spinner
+                AnimatedImage {
+                    anchors.fill: parent
+                    source: "qrc:/images/spinner.gif"
+                    playing: loading
+                }
+                Layout.preferredHeight: 100
+                Layout.preferredWidth: 100
+                Layout.alignment: Qt.AlignHCenter
             }
 
             Button {
                 id: stopLoadingButton
+                text: qsTr("Stop loading")
+                Layout.alignment: Qt.AlignHCenter
+                onClicked: contactModel.stopLoading()
             }
 
             Item {
                 Layout.fillHeight: true
             }
         }
+        Item {
+            Layout.fillWidth: true
+        }
+    }
+
+
+
+    ColumnLayout {
+        anchors.fill: parent
+        visible: !loading
 
         ListView {
             id: contactsView
             model: contactModel
-            visible: !loading
 
             Layout.fillHeight: true
             Layout.fillWidth: true
 
             boundsBehavior: Flickable.StopAtBounds
 
-            ScrollBar.vertical: ScrollBar {}
+            ScrollBar.vertical: ScrollBar {
+                minimumSize: 0.1
+            }
 
             delegate: Rectangle {
                 width: contactsView.width
@@ -169,7 +191,6 @@ Window {
         }
 
         RowLayout {
-            visible: !loading
             Button {
                 id: saveButton
                 text: qsTr("Save")
@@ -218,12 +239,12 @@ Window {
             console.log("Selected file:", fileName)
             if (fileName !== null && fileName !== "") {
                 if (fileDialog.selectExisting) {
-//                    loading = true
+                    loading = true
                     if (!contactModel.loadData(fileName)) {
                         messageDialog.text = qsTr("Error when loading data")
                         messageDialog.open()
                     }
-//                    loading = false
+                    loading = false
                 } else {
                     if (!contactModel.saveData(fileName)) {
                         messageDialog.text = qsTr("Error when saving data")

@@ -97,6 +97,7 @@ bool ContactModel::loadData(const QString &fileName)
     QEventLoop loop;
     connect(&fileLoader, &AsyncFileLoader::loadingFinished, &loop, &QEventLoop::quit);
     connect(this, &ContactModel::newLineNeeded, &fileLoader, &AsyncFileLoader::loadNextLine, Qt::QueuedConnection);
+    connect(this, &ContactModel::stopLoadingNeeded, &fileLoader, &AsyncFileLoader::stopLoading, Qt::QueuedConnection);
     connect(&fileLoader, &AsyncFileLoader::lineLoaded, this, &ContactModel::processLine);
     connect(&fileLoader, &AsyncFileLoader::errorOccured, [&loop](const QString &reason) {
         qDebug() << "Error:" << reason;
@@ -185,12 +186,19 @@ bool ContactModel::removeRow(int row)
     return true;
 }
 
+void ContactModel::stopLoading()
+{
+    emit stopLoadingNeeded();
+}
+
 void ContactModel::processLine(const QString &line)
 {
+#ifdef QT_DEBUG
     qDebug() << "Line:" << line;
+#endif // QT_DEBUG
     QStringList parts = line.split(QRegularExpression("\\s+"));
     if (parts.size() < 4) {
-        qDebug() << "Not enough fields";
+        qDebug() << "Not enough fields" << line;
         emit newLineNeeded();
         return;
     }

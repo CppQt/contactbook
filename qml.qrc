@@ -4,4 +4,7 @@
         <file>MainWindow.qml</file>
         <file>EditRecordDialog.qml</file>
     </qresource>
+    <qresource prefix="/images">
+        <file>spinner.gif</file>
+    </qresource>
 </RCC>

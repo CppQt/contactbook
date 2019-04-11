@@ -55,7 +55,6 @@ public:
     virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
     virtual QHash<int, QByteArray> roleNames() const override;
 
-
     Q_INVOKABLE bool loadData(const QString &fileName);
     Q_INVOKABLE bool saveData(const QString &fileName, bool overwrite = false);
     Q_INVOKABLE bool addRowBefore(int row, const QString &firstName, const QString &lastName, const QDate &birthday, const QString &email);
@@ -63,11 +62,14 @@ public:
     Q_INVOKABLE bool appendRow(const QString &firstName, const QString &lastName, const QDate &birthday, const QString &email);
     Q_INVOKABLE bool removeRow(int row);
 
+    Q_INVOKABLE void stopLoading();
+
 private slots:
     void processLine(const QString &line);
 
 signals:
     void newLineNeeded();
+    void stopLoadingNeeded();
 
 private:
     QVector<Record> m_contacts;
