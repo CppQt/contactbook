@@ -176,6 +176,16 @@ bool ContactModel::addRowAfter(int row, const QString &firstName, const QString 
     return true;
 }
 
+bool ContactModel::appendRow(const QString &firstName, const QString &lastName, const QDate &birthday, const QString &email)
+{
+    int row = contacts.size();
+    beginInsertRows({}, row, row);
+    Record record(firstName, lastName, birthday, email);
+    contacts.append(record);
+    endInsertRows();
+    return true;
+}
+
 bool ContactModel::removeRow(int row)
 {
     if (row < 0 || row >= contacts.size()) {

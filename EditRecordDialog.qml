@@ -71,6 +71,7 @@ Dialog {
             Layout.row: 3
             id: emailInput
             selectByMouse: true
+            inputMethodHints: Qt.ImhEmailCharactersOnly
         }
     }
 

@@ -60,6 +60,7 @@ public:
     Q_INVOKABLE bool saveData(const QString &fileName, bool overwrite = false);
     Q_INVOKABLE bool addRowBefore(int row, const QString &firstName, const QString &lastName, const QDate &birthday, const QString &email);
     Q_INVOKABLE bool addRowAfter(int row, const QString &firstName, const QString &lastName, const QDate &birthday, const QString &email);
+    Q_INVOKABLE bool appendRow(const QString &firstName, const QString &lastName, const QDate &birthday, const QString &email);
     Q_INVOKABLE bool removeRow(int row);
 
 private:

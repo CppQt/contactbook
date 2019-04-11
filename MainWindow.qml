@@ -219,7 +219,9 @@ Window {
                 model.email = email
             } else {
                 var date = Date.fromLocaleDateString(Qt.locale(), birthday, Locale.ShortFormat)
-                if (isBefore) {
+                if (row === -1) {
+                    contactModel.appendRow(firstName, lastName, date, email)
+                } else if (isBefore) {
                     contactModel.addRowBefore(row, firstName, lastName, date, email)
                 } else {
                     contactModel.addRowAfter(row, firstName, lastName, date, email)
