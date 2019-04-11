@@ -63,8 +63,14 @@ public:
     Q_INVOKABLE bool appendRow(const QString &firstName, const QString &lastName, const QDate &birthday, const QString &email);
     Q_INVOKABLE bool removeRow(int row);
 
+private slots:
+    void processLine(const QString &line);
+
+signals:
+    void newLineNeeded();
+
 private:
-    QVector<Record> contacts;
+    QVector<Record> m_contacts;
 };
 
 #endif // CONTACTMODEL_H

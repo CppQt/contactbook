@@ -3,7 +3,10 @@
 #include <QFile>
 #include <QTextStream>
 #include <QRegularExpression>
+#include <QEventLoop>
 #include <QDebug>
+
+#include "asyncfileloader.h"
 
 const QString EMAIL_VALIDATOR = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"
                                 "\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|"
@@ -19,23 +22,23 @@ ContactModel::ContactModel(QObject *parent) : QAbstractListModel(parent)
 int ContactModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent)
-    return contacts.size();
+    return m_contacts.size();
 }
 
 QVariant ContactModel::data(const QModelIndex &index, int role) const
 {
-    if (index.row() < 0 || index.row() >= contacts.size())
+    if (index.row() < 0 || index.row() >= m_contacts.size())
         return QVariant();
 
     switch (static_cast<Roles>(role)) {
     case Roles::FirstNameRole:
-        return contacts.at(index.row()).firstName;
+        return m_contacts.at(index.row()).firstName;
     case Roles::LastNameRole:
-        return contacts.at(index.row()).lastName;
+        return m_contacts.at(index.row()).lastName;
     case Roles::BirthdayRole:
-        return contacts.at(index.row()).birthday;
+        return m_contacts.at(index.row()).birthday;
     case Roles::EmailRole:
-        return contacts.at(index.row()).email;
+        return m_contacts.at(index.row()).email;
     default:
         return QVariant();
     }
@@ -43,21 +46,21 @@ QVariant ContactModel::data(const QModelIndex &index, int role) const
 
 bool ContactModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
-    if (index.row() < 0 || index.row() >= contacts.size())
+    if (index.row() < 0 || index.row() >= m_contacts.size())
         return false;
 
     switch (static_cast<Roles>(role)) {
     case Roles::FirstNameRole:
-        contacts[index.row()].firstName = value.toString();
+        m_contacts[index.row()].firstName = value.toString();
         break;
     case Roles::LastNameRole:
-        contacts[index.row()].lastName = value.toString();
+        m_contacts[index.row()].lastName = value.toString();
         break;
     case Roles::BirthdayRole:
-        contacts[index.row()].birthday = value.toDate();
+        m_contacts[index.row()].birthday = value.toDate();
         break;
     case Roles::EmailRole:
-        contacts[index.row()].email = value.toString();
+        m_contacts[index.row()].email = value.toString();
         break;
     default:
         return false;
@@ -85,46 +88,31 @@ QHash<int, QByteArray> ContactModel::roleNames() const
 bool ContactModel::loadData(const QString &fileName)
 {
     qDebug() << "Open file:" << fileName;
-    if (!QFile::exists(fileName))
-        return false;
 
-    QFile file(fileName);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    AsyncFileLoader fileLoader(fileName);
+    if (!fileLoader.fileExists()) {
         return false;
     }
 
-    beginResetModel();
-    contacts.clear();
-    QTextStream stream(&file);
-    QString line;
-    while (stream.readLineInto(&line)) {
-        qDebug() << "Line:" << line;
-        QStringList parts = line.split(QRegularExpression("\\s+"));
-        if (parts.size() < 4) {
-            qDebug() << "Not enough fields";
-            continue;
-        }
-
-        QString firstName = parts.at(0);
-        QString lastName = parts.at(1);
-        QString dateString = parts.at(2);
-        QDate date = QDate::fromString(dateString, Qt::ISODate);
-        if (!date.isValid()) {
-            qDebug() << "Date is invalid" << dateString;
-            continue;
-        }
-        QString emailString = parts.at(3);
-        QRegularExpression vRegExp(EMAIL_VALIDATOR);
-        if (!vRegExp.match(emailString).hasMatch()) {
-            qDebug() << "Email is invalid" << emailString;
-            continue;
-        }
-
-        Record record(firstName, lastName, date, emailString);
-        contacts.append(record);
+    QEventLoop loop;
+    connect(&fileLoader, &AsyncFileLoader::loadingFinished, &loop, &QEventLoop::quit);
+    connect(this, &ContactModel::newLineNeeded, &fileLoader, &AsyncFileLoader::loadNextLine, Qt::QueuedConnection);
+    connect(&fileLoader, &AsyncFileLoader::lineLoaded, this, &ContactModel::processLine);
+    connect(&fileLoader, &AsyncFileLoader::errorOccured, [&loop](const QString &reason) {
+        qDebug() << "Error:" << reason;
+        loop.quit();
+    });
+    fileLoader.startLoading();
+    if (fileLoader.error().isEmpty()) {
+        beginResetModel();
+        m_contacts.clear();
+        emit newLineNeeded();
+        loop.exec();
+        endResetModel();
+        return true;
     }
-    endResetModel();
-    return true;
+
+    return false;
 }
 
 bool ContactModel::saveData(const QString &fileName, bool overwrite)
@@ -142,7 +130,7 @@ bool ContactModel::saveData(const QString &fileName, bool overwrite)
     }
 
     QTextStream stream(&file);
-    for (const Record &record : qAsConst(contacts)) {
+    for (const Record &record : qAsConst(m_contacts)) {
         QString line = QStringLiteral("%1 %2 %3 %4 ")
                 .arg(record.firstName, record.lastName, record.birthday.toString(Qt::ISODate), record.email);
         stream << line << QChar(QChar::LineFeed);
@@ -153,46 +141,78 @@ bool ContactModel::saveData(const QString &fileName, bool overwrite)
 
 bool ContactModel::addRowBefore(int row, const QString &firstName, const QString &lastName, const QDate &birthday, const QString &email)
 {
-    if (row < 0 || row >= contacts.size()) {
+    if (row < 0 || row >= m_contacts.size()) {
         return false;
     }
 
     beginInsertRows({}, row, row);
     Record record(firstName, lastName, birthday, email);
-    contacts.insert(row, record);
+    m_contacts.insert(row, record);
     endInsertRows();
     return true;
 }
 
 bool ContactModel::addRowAfter(int row, const QString &firstName, const QString &lastName, const QDate &birthday, const QString &email)
 {
-    if (row < 0 || row >= contacts.size()) {
+    if (row < 0 || row >= m_contacts.size()) {
         return false;
     }
     beginInsertRows({}, row + 1, row + 1);
     Record record(firstName, lastName, birthday, email);
-    contacts.insert(row + 1, record);
+    m_contacts.insert(row + 1, record);
     endInsertRows();
     return true;
 }
 
 bool ContactModel::appendRow(const QString &firstName, const QString &lastName, const QDate &birthday, const QString &email)
 {
-    int row = contacts.size();
+    int row = m_contacts.size();
     beginInsertRows({}, row, row);
     Record record(firstName, lastName, birthday, email);
-    contacts.append(record);
+    m_contacts.append(record);
     endInsertRows();
     return true;
 }
 
 bool ContactModel::removeRow(int row)
 {
-    if (row < 0 || row >= contacts.size()) {
+    if (row < 0 || row >= m_contacts.size()) {
         return false;
     }
     beginRemoveRows({}, row, row);
-    contacts.remove(row);
+    m_contacts.remove(row);
     endRemoveRows();
     return true;
+}
+
+void ContactModel::processLine(const QString &line)
+{
+    qDebug() << "Line:" << line;
+    QStringList parts = line.split(QRegularExpression("\\s+"));
+    if (parts.size() < 4) {
+        qDebug() << "Not enough fields";
+        emit newLineNeeded();
+        return;
+    }
+
+    QString firstName = parts.at(0);
+    QString lastName = parts.at(1);
+    QString dateString = parts.at(2);
+    QDate date = QDate::fromString(dateString, Qt::ISODate);
+    if (!date.isValid()) {
+        qDebug() << "Date is invalid" << dateString;
+        emit newLineNeeded();
+        return;
+    }
+    QString emailString = parts.at(3);
+    QRegularExpression vRegExp(EMAIL_VALIDATOR);
+    if (!vRegExp.match(emailString).hasMatch()) {
+        qDebug() << "Email is invalid" << emailString;
+        emit newLineNeeded();
+        return;
+    }
+
+    Record record(firstName, lastName, date, emailString);
+    m_contacts.append(record);
+    emit newLineNeeded();
 }

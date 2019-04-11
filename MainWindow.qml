@@ -7,11 +7,42 @@ import QtQuick.Dialogs 1.2
 Window {
     title: qsTr("Contact list")
 
+    property bool loading: false
+
     ColumnLayout {
         anchors.fill: parent
+
+        ColumnLayout {
+            id: loader
+            visible: loading
+
+            Item {
+                Layout.fillHeight: true
+            }
+
+            Label {
+                text: qsTr("Loading...")
+            }
+
+            ProgressBar {
+                id: progressBar
+                from: 0
+                to: 100
+            }
+
+            Button {
+                id: stopLoadingButton
+            }
+
+            Item {
+                Layout.fillHeight: true
+            }
+        }
+
         ListView {
             id: contactsView
             model: contactModel
+            visible: !loading
 
             Layout.fillHeight: true
             Layout.fillWidth: true
@@ -138,6 +169,7 @@ Window {
         }
 
         RowLayout {
+            visible: !loading
             Button {
                 id: saveButton
                 text: qsTr("Save")
@@ -186,10 +218,12 @@ Window {
             console.log("Selected file:", fileName)
             if (fileName !== null && fileName !== "") {
                 if (fileDialog.selectExisting) {
+//                    loading = true
                     if (!contactModel.loadData(fileName)) {
                         messageDialog.text = qsTr("Error when loading data")
                         messageDialog.open()
                     }
+//                    loading = false
                 } else {
                     if (!contactModel.saveData(fileName)) {
                         messageDialog.text = qsTr("Error when saving data")

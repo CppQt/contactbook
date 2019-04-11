@@ -14,7 +14,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-    contactmodel.cpp
+    contactmodel.cpp \
+    asyncfileloader.cpp
 
 RESOURCES += qml.qrc
 
@@ -30,4 +31,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    contactmodel.h
+    contactmodel.h \
+    asyncfileloader.h
