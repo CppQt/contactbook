@@ -69,6 +69,18 @@ Window {
                 Menu {
                     id: contextMenu
                     MenuItem {
+                        text: qsTr("Edit")
+                        onTriggered: {
+                            editRecordDialog.resetFields()
+                            editRecordDialog.firstName = model.firstName
+                            editRecordDialog.lastName = model.lastName
+                            editRecordDialog.birthday = Qt.formatDate(model.birthday, Qt.DefaultLocaleShortDate)
+                            editRecordDialog.email = model.email
+                            editRecordDialog.model = model
+                            editRecordDialog.open()
+                        }
+                    }
+                    MenuItem {
                         text: qsTr("Insert before")
                         onTriggered: {
                             editRecordDialog.resetFields()
@@ -173,10 +185,11 @@ Window {
 
         onAccepted: {
             if (!model) {
+                var date = Date.fromLocaleDateString(Qt.locale(), birthday, Locale.ShortFormat)
                 if (isBefore) {
-                    contactModel.addRowBefore(row, firstName, lastName, Date.fromLocaleDateString(Qt.locale(), birthday, Locale.ShortFormat), email)
+                    contactModel.addRowBefore(row, firstName, lastName, date, email)
                 } else {
-                    contactModel.addRowAfter(row, firstName, lastName, Date.fromLocaleDateString(Qt.locale(), birthday, Locale.ShortFormat), email)
+                    contactModel.addRowAfter(row, firstName, lastName, date, email)
                 }
             }
         }

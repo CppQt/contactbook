@@ -17,6 +17,7 @@ Dialog {
         lastName = ""
         birthday = ""
         email = ""
+        model = null
     }
 
     GridLayout {
