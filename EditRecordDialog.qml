@@ -33,6 +33,7 @@ Dialog {
             Layout.column: 1
             Layout.row: 0
             id: firstNameInput
+            selectByMouse: true
         }
 
         Label {
@@ -44,6 +45,7 @@ Dialog {
             Layout.column: 1
             Layout.row: 1
             id: lastNameInput
+            selectByMouse: true
         }
 
         Label {
@@ -55,6 +57,8 @@ Dialog {
             Layout.column: 1
             Layout.row: 2
             id: birthdayInput
+            selectByMouse: true
+            inputMethodHints: Qt.ImhDate
         }
 
         Label {
@@ -66,22 +70,9 @@ Dialog {
             Layout.column: 1
             Layout.row: 3
             id: emailInput
+            selectByMouse: true
         }
     }
 
     standardButtons: StandardButton.Ok | StandardButton.Cancel
-
-    onAccepted: {
-        if (model) {
-            model.firstName = firstName
-            model.lastName = lastName
-            model.birthday = Date.fromLocaleDateString(Qt.locale(), birthday, Locale.ShortFormat)
-            model.email = email
-        }
-        model = null
-    }
-
-    onRejected: {
-        model = null
-    }
 }

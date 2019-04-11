@@ -56,6 +56,7 @@ Window {
                     anchors.fill: parent
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
                     onClicked: {
+                        contactsView.currentIndex = index
                         if (mouse.button === Qt.LeftButton) {
                             editRecordDialog.resetFields()
                             editRecordDialog.firstName = model.firstName
@@ -72,7 +73,7 @@ Window {
                 Menu {
                     id: contextMenu
                     MenuItem {
-                        text: qsTr("Edit")
+                        text: qsTr("Edit contact")
                         onTriggered: {
                             editRecordDialog.resetFields()
                             editRecordDialog.firstName = model.firstName
@@ -84,7 +85,7 @@ Window {
                         }
                     }
                     MenuItem {
-                        text: qsTr("Insert before")
+                        text: qsTr("Insert contact before")
                         onTriggered: {
                             editRecordDialog.resetFields()
                             editRecordDialog.isBefore = true
@@ -93,7 +94,7 @@ Window {
                         }
                     }
                     MenuItem {
-                        text: qsTr("Insert after")
+                        text: qsTr("Insert contact after")
                         onTriggered: {
                             editRecordDialog.resetFields()
                             editRecordDialog.isBefore = false
@@ -102,11 +103,35 @@ Window {
                         }
                     }
                     MenuItem {
-                        text: qsTr("Remove")
+                        text: qsTr("Remove contact")
                         onTriggered: {
                             console.log("Removed row:", index)
                             contactModel.removeRow(index)
                         }
+                    }
+                }
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                acceptedButtons: Qt.RightButton
+                z: -1
+                onClicked: {
+                    if (mouse.button === Qt.RightButton) {
+                        listMenu.popup()
+                    }
+                }
+            }
+
+            Menu {
+                id: listMenu
+                MenuItem {
+                    text: qsTr("Add new contact")
+                    onTriggered: {
+                        editRecordDialog.resetFields()
+                        editRecordDialog.isBefore = false
+                        editRecordDialog.row = contactModel.rowCount() - 1
+                        editRecordDialog.open()
                     }
                 }
             }
@@ -187,7 +212,12 @@ Window {
         property int row: -1
 
         onAccepted: {
-            if (!model) {
+            if (model) {
+                model.firstName = firstName
+                model.lastName = lastName
+                model.birthday = Date.fromLocaleDateString(Qt.locale(), birthday, Locale.ShortFormat)
+                model.email = email
+            } else {
                 var date = Date.fromLocaleDateString(Qt.locale(), birthday, Locale.ShortFormat)
                 if (isBefore) {
                     contactModel.addRowBefore(row, firstName, lastName, date, email)
