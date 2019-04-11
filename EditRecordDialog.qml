@@ -4,6 +4,7 @@ import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.12
 
 Dialog {
+    title: qsTr("Edit line")
 
     property alias firstName: firstNameInput.text
     property alias lastName: lastNameInput.text

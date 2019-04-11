@@ -5,17 +5,20 @@ import QtQuick.Layouts 1.12
 import QtQuick.Dialogs 1.2
 
 Window {
-    title: qsTr("Contact book")
+    title: qsTr("Contact list")
 
     ColumnLayout {
         anchors.fill: parent
-
         ListView {
             id: contactsView
             model: contactModel
 
             Layout.fillHeight: true
             Layout.fillWidth: true
+
+            boundsBehavior: Flickable.StopAtBounds
+
+            ScrollBar.vertical: ScrollBar {}
 
             delegate: Rectangle {
                 width: contactsView.width
