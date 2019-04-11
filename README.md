@@ -6,16 +6,19 @@ Contact Book app is a C++/Qt/QML test app
 ## Specifications:
 
 - Qt 5.12
-- qmake
-- Linux Ubuntu 18.04
+- qmake building system
+- Tested on Linux Ubuntu 18.04
 
 ## Features:
 
 ### Load from file:
 Contact Book application allow to open text files, parse data and load contacts from selected text file in the main dialogue.
 
+When file is being loaded user can break process and use only already loaded contacts.
+
 ### Remove and Insert
-User can remove chosen contact or insert a new one into any position (after/before) of a clicked existed contact. 
+User can remove chosen contact or insert a new one into any position (after/before) of a clicked existed contact or at
+end of list. 
 
 ### Edit
 User can edit any contact.
@@ -59,3 +62,6 @@ e-mail validation
 
 ![contactbook app - edit window](https://github.com/alexoveli/contactbook/blob/master/app%20screenshots/contactbook%20app%20-%20edit%20window.png)
 
+5. contactbook app - loading file
+
+![contactbook app - loading file](https://github.com/alexoveli/contactbook/blob/master/app%20screenshots/contactbook%20app%20-%20loading%20file.png)
