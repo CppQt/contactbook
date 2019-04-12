@@ -13,8 +13,13 @@ public:
     explicit AsyncFileLoader(const QString &fileName, QObject *parent = nullptr);
     virtual ~AsyncFileLoader() override;
 
+    void setFileName(const QString &fileName);
+
     QString error() const;
     bool fileExists() const;
+
+    static AsyncFileLoader *instance();
+    static void destroyInstance();
 
 public slots:
     void startLoading();
@@ -34,6 +39,7 @@ private:
     QString m_error;
     QScopedPointer<QFile> m_file;
     QScopedPointer<QTextStream> m_stream;
+    static AsyncFileLoader *m_instance;
 };
 
 #endif // ASYNCFILELOADER_H

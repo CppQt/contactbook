@@ -89,30 +89,32 @@ bool ContactModel::loadData(const QString &fileName)
 {
     qDebug() << "Open file:" << fileName;
 
-    AsyncFileLoader fileLoader(fileName);
-    if (!fileLoader.fileExists()) {
+    AsyncFileLoader::instance()->setFileName(fileName);
+    if (!AsyncFileLoader::instance()->fileExists()) {
         return false;
     }
 
     QEventLoop loop;
-    connect(&fileLoader, &AsyncFileLoader::loadingFinished, &loop, &QEventLoop::quit);
-    connect(this, &ContactModel::newLineNeeded, &fileLoader, &AsyncFileLoader::loadNextLine, Qt::QueuedConnection);
-    connect(this, &ContactModel::stopLoadingNeeded, &fileLoader, &AsyncFileLoader::stopLoading, Qt::QueuedConnection);
-    connect(&fileLoader, &AsyncFileLoader::lineLoaded, this, &ContactModel::processLine);
-    connect(&fileLoader, &AsyncFileLoader::errorOccured, [&loop](const QString &reason) {
+    connect(AsyncFileLoader::instance(), &AsyncFileLoader::loadingFinished, &loop, &QEventLoop::quit);
+    connect(this, &ContactModel::newLineNeeded, AsyncFileLoader::instance(), &AsyncFileLoader::loadNextLine, Qt::QueuedConnection);
+    connect(this, &ContactModel::stopLoadingNeeded, AsyncFileLoader::instance(), &AsyncFileLoader::stopLoading, Qt::QueuedConnection);
+    connect(AsyncFileLoader::instance(), &AsyncFileLoader::lineLoaded, this, &ContactModel::processLine);
+    connect(AsyncFileLoader::instance(), &AsyncFileLoader::errorOccured, [&loop](const QString &reason) {
         qDebug() << "Error:" << reason;
         loop.quit();
     });
-    fileLoader.startLoading();
-    if (fileLoader.error().isEmpty()) {
+    AsyncFileLoader::instance()->startLoading();
+    if (AsyncFileLoader::instance()->error().isEmpty()) {
         beginResetModel();
         m_contacts.clear();
         emit newLineNeeded();
         loop.exec();
         endResetModel();
+        AsyncFileLoader::destroyInstance();
         return true;
     }
 
+    AsyncFileLoader::destroyInstance();
     return false;
 }
 
