@@ -20,6 +20,8 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
 
+    qmlRegisterUncreatableType<ContactModel>("data.model", 1, 0, "ContactModel", "Not creatable as it is an enum type");
+
     engine.rootContext()->setContextProperty("contactModel", &model);
 
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));

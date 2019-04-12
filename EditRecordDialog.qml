@@ -11,14 +11,16 @@ Dialog {
     property alias birthday: birthdayInput.text
     property alias email: emailInput.text
 
-    property var model: null
+    property bool edit: false
+    property bool isBefore: true
+    property int row: -1
 
     function resetFields() {
         firstName = ""
         lastName = ""
         birthday = ""
         email = ""
-        model = null
+        edit = false
     }
 
     GridLayout {

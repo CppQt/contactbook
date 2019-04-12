@@ -4,6 +4,8 @@ import QtQuick.Controls 2.5
 import QtQuick.Layouts 1.12
 import QtQuick.Dialogs 1.2
 
+import data.model 1.0
+
 Window {
     title: qsTr("Contact list")
 
@@ -116,7 +118,7 @@ Window {
                             editRecordDialog.lastName = model.lastName
                             editRecordDialog.birthday = Qt.formatDate(model.birthday, Qt.DefaultLocaleShortDate)
                             editRecordDialog.email = model.email
-                            editRecordDialog.model = model
+                            editRecordDialog.edit = true
                             editRecordDialog.open()
                         } else if (mouse.button === Qt.RightButton) {
                             contextMenu.popup()
@@ -133,7 +135,7 @@ Window {
                             editRecordDialog.lastName = model.lastName
                             editRecordDialog.birthday = Qt.formatDate(model.birthday, Qt.DefaultLocaleShortDate)
                             editRecordDialog.email = model.email
-                            editRecordDialog.model = model
+                            editRecordDialog.edit = true
                             editRecordDialog.open()
                         }
                     }
@@ -143,6 +145,7 @@ Window {
                             editRecordDialog.resetFields()
                             editRecordDialog.isBefore = true
                             editRecordDialog.row = index
+                            editRecordDialog.edit = false
                             editRecordDialog.open()
                         }
                     }
@@ -152,6 +155,7 @@ Window {
                             editRecordDialog.resetFields()
                             editRecordDialog.isBefore = false
                             editRecordDialog.row = index
+                            editRecordDialog.edit = false
                             editRecordDialog.open()
                         }
                     }
@@ -184,6 +188,7 @@ Window {
                         editRecordDialog.resetFields()
                         editRecordDialog.isBefore = false
                         editRecordDialog.row = contactModel.rowCount() - 1
+                        editRecordDialog.edit = false
                         editRecordDialog.open()
                     }
                 }
@@ -246,7 +251,7 @@ Window {
                     }
                     loading = false
                 } else {
-                    if (!contactModel.saveData(fileName)) {
+                    if (!contactModel.saveData(fileName, true)) {
                         messageDialog.text = qsTr("Error when saving data")
                         messageDialog.open()
                     }
@@ -262,18 +267,17 @@ Window {
         id: editRecordDialog
         width: 200
         height: 100
-
-        property bool isBefore: true
-        property int row: -1
+        title: edit ? qsTr("Edit contant") : qsTr("New contact")
 
         onAccepted: {
-            if (model) {
-                model.firstName = firstName
-                model.lastName = lastName
-                model.birthday = Date.fromLocaleDateString(Qt.locale(), birthday, Locale.ShortFormat)
-                model.email = email
+            var date = Date.fromLocaleDateString(Qt.locale(), birthday, Locale.ShortFormat)
+            if (edit) {
+                var index = contactModel.index(contactsView.currentIndex, 0)
+                contactModel.setData(index, firstName, ContactModel.FirstNameRole)
+                contactModel.setData(index, lastName, ContactModel.LastNameRole)
+                contactModel.setData(index, date, ContactModel.BirthdayRole)
+                contactModel.setData(index, email, ContactModel.EmailRole)
             } else {
-                var date = Date.fromLocaleDateString(Qt.locale(), birthday, Locale.ShortFormat)
                 if (row === -1) {
                     contactModel.appendRow(firstName, lastName, date, email)
                 } else if (isBefore) {
