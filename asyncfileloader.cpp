@@ -4,6 +4,8 @@
 #include <QTextStream>
 #include <QThread>
 
+constexpr int MAX_LINE_LENGTH = 512;
+
 AsyncFileLoader *AsyncFileLoader::m_instance = nullptr;
 
 AsyncFileLoader::AsyncFileLoader(const QString &fileName, QObject *parent) :
@@ -97,7 +99,7 @@ void AsyncFileLoader::loadNextLine()
         return;
     }
 
-    QString line = m_stream->readLine(255);
+    QString line = m_stream->readLine(MAX_LINE_LENGTH);
     m_error.clear();
     emit lineLoaded(line);
 }
