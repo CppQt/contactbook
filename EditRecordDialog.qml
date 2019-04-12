@@ -1,12 +1,13 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.5
-import QtQuick.Dialogs 1.2 as Dialogs
+import QtQuick.Window 2.12
 import QtQuick.Layouts 1.12
 import data.date 1.0
 
-Dialogs.Dialog {
+Window {
     id: dialog
     title: qsTr("Edit line")
+    modality: Qt.WindowModal
 
     property alias firstName: firstNameInput.text
     property alias lastName: lastNameInput.text
@@ -16,6 +17,10 @@ Dialogs.Dialog {
     property bool edit: false
     property bool isBefore: true
     property int row: -1
+    property var parentWindow: null
+
+    signal accepted()
+    signal rejected()
 
     function getDateMask() {
         var year = 2000
@@ -32,6 +37,18 @@ Dialogs.Dialog {
         birthday = ""
         email = ""
         edit = false
+    }
+
+    function open() {
+        if (parentWindow) {
+            x = parentWindow.x + (parentWindow.width - width) / 2
+            y = parentWindow.y + (parentWindow.height - height) / 2
+        }
+        show()
+    }
+
+    function close() {
+        hide()
     }
 
     GridLayout {
@@ -137,7 +154,6 @@ Dialogs.Dialog {
             }
         }
     }
-    standardButtons: DialogButtonBox.NoButton
 
     DatePicker {
         id: calendar

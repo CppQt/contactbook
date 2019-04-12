@@ -272,6 +272,7 @@ Window {
         width: 360
         height: 280
         title: edit ? qsTr("Edit contant") : qsTr("New contact")
+        parentWindow: mainWindow
 
         onAccepted: {
             var date = Date.fromLocaleDateString(Qt.locale(), birthday, Locale.ShortFormat)
