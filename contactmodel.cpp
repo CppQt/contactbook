@@ -193,6 +193,11 @@ void ContactModel::stopLoading()
     emit stopLoadingNeeded();
 }
 
+QString ContactModel::emailValidator() const
+{
+    return EMAIL_VALIDATOR;
+}
+
 void ContactModel::processLine(const QString &line)
 {
 #ifdef QT_DEBUG

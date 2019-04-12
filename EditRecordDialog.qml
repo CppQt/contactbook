@@ -37,6 +37,8 @@ Dialogs.Dialog {
             Layout.row: 0
             id: firstNameInput
             selectByMouse: true
+            color: acceptableInput ? "black" : "red"
+            validator: RegExpValidator { regExp: /[^\s]+/ }
         }
 
         Label {
@@ -49,6 +51,8 @@ Dialogs.Dialog {
             Layout.row: 1
             id: lastNameInput
             selectByMouse: true
+            color: acceptableInput ? "black" : "red"
+            validator: RegExpValidator { regExp: /[^\s]+/ }
         }
 
         Label {
@@ -62,6 +66,7 @@ Dialogs.Dialog {
             id: birthdayInput
             selectByMouse: true
             inputMethodHints: Qt.ImhDate
+            color: acceptableInput ? "black" : "red"
         }
 
         Label {
@@ -75,6 +80,8 @@ Dialogs.Dialog {
             id: emailInput
             selectByMouse: true
             inputMethodHints: Qt.ImhEmailCharactersOnly
+            color: acceptableInput ? "black" : "red"
+            validator: RegExpValidator { regExp: new RegExp(contactModel.emailValidator()) }
         }
         DialogButtonBox {
             Layout.column: 1
@@ -85,6 +92,10 @@ Dialogs.Dialog {
             Button {
                 id: saveButton
                 text: qsTr("Ok")
+                enabled: firstNameInput.acceptableInput &&
+                         lastNameInput.acceptableInput &&
+                         birthdayInput.acceptableInput &&
+                         emailInput.acceptableInput
                 DialogButtonBox.buttonRole: DialogButtonBox.AcceptRole
             }
             Button {

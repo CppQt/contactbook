@@ -64,6 +64,8 @@ public:
 
     Q_INVOKABLE void stopLoading();
 
+    Q_INVOKABLE QString emailValidator() const;
+
 private slots:
     void processLine(const QString &line);
 
