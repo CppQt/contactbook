@@ -21,7 +21,7 @@ User can remove chosen contact or insert a new one into any position (after/befo
 end of list. 
 
 ### Edit
-User can edit any contact.
+User can edit any contact. Validation is presented (name and surename cannot contain spaces, email and birthday checked by mask). Date can be selected from date picker popup.
 
 ### Safe to file:
 User can fill previously loaded file and save it. 
@@ -62,6 +62,10 @@ e-mail validation
 
 ![contactbook app - edit window](https://github.com/alexoveli/contactbook/blob/master/app%20screenshots/contactbook%20app%20-%20edit%20window.png)
 
-5. contactbook app - loading file
+5. contactbook app - edit window - select date
+
+![contactbook app - edit window - select date](https://github.com/alexoveli/contactbook/blob/master/app%20screenshots/contactbook%20app%20-%20edit%20window%20-%20select%20date.png)
+
+6. contactbook app - loading file
 
 ![contactbook app - loading file](https://github.com/alexoveli/contactbook/blob/master/app%20screenshots/contactbook%20app%20-%20loading%20file.png)
