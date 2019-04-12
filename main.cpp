@@ -3,6 +3,7 @@
 #include <QQmlContext>
 
 #include "contactmodel.h"
+#include "datevalidator.h"
 
 int main(int argc, char *argv[])
 {
@@ -20,6 +21,7 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
 
+    qmlRegisterType<DateValidator>("data.date", 1, 0, "DateValidator");
     qmlRegisterUncreatableType<ContactModel>("data.model", 1, 0, "ContactModel", "Not creatable as it is an enum type");
 
     engine.rootContext()->setContextProperty("contactModel", &model);

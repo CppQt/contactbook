@@ -2,6 +2,7 @@ import QtQuick 2.12
 import QtQuick.Controls 2.5
 import QtQuick.Dialogs 1.2 as Dialogs
 import QtQuick.Layouts 1.12
+import data.date 1.0
 
 Dialogs.Dialog {
     id: dialog
@@ -15,6 +16,15 @@ Dialogs.Dialog {
     property bool edit: false
     property bool isBefore: true
     property int row: -1
+
+    function getDateMask() {
+        var year = 2000
+        var month = 12
+        var day = 25
+        var date = new Date(year, month - 1, day)
+        var dateString = date.toLocaleDateString(Qt.locale(), Locale.ShortFormat)
+        return dateString.replace(/\d/g, "9").replace(/[\\\/\.\:\,]/g, "\\$&") + ";_"
+    }
 
     function resetFields() {
         firstName = ""
@@ -67,6 +77,8 @@ Dialogs.Dialog {
             selectByMouse: true
             inputMethodHints: Qt.ImhDate
             color: acceptableInput ? "black" : "red"
+            inputMask: getDateMask()
+            validator: DateValidator {}
         }
 
         Label {

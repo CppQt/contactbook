@@ -11,6 +11,11 @@ Window {
 
     property bool loading: false
 
+    function showWarning(message) {
+        messageDialog.text = message
+        messageDialog.open()
+    }
+
     RowLayout {
         anchors.fill: parent
         visible: loading
@@ -55,8 +60,6 @@ Window {
             Layout.fillWidth: true
         }
     }
-
-
 
     ColumnLayout {
         anchors.fill: parent
@@ -249,14 +252,12 @@ Window {
                 if (fileDialog.selectExisting) {
                     loading = true
                     if (!contactModel.loadData(fileName)) {
-                        messageDialog.text = qsTr("Error when loading data")
-                        messageDialog.open()
+                        showWarning(qsTr("Error when loading data"))
                     }
                     loading = false
                 } else {
                     if (!contactModel.saveData(fileName, true)) {
-                        messageDialog.text = qsTr("Error when saving data")
-                        messageDialog.open()
+                        showWarning(qsTr("Error when saving data"))
                     }
                 }
             }
