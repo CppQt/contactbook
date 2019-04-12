@@ -79,6 +79,18 @@ Dialogs.Dialog {
             color: acceptableInput ? "black" : "red"
             inputMask: getDateMask()
             validator: DateValidator {}
+            Button {
+                anchors.right: parent.right
+                height: parent.height
+                width: height
+                icon.source: "qrc:/images/calendar.png"
+                icon.width: width
+                icon.height: height
+                onClicked: {
+                    var date = Date.fromLocaleDateString(Qt.locale(), birthdayInput.text, Locale.ShortFormat)
+                    calendar.popup(date, {x: 0, y: 0})
+                }
+            }
         }
 
         Label {
@@ -126,4 +138,11 @@ Dialogs.Dialog {
         }
     }
     standardButtons: DialogButtonBox.NoButton
+
+    DatePicker {
+        id: calendar
+        onAccepted: {
+            birthdayInput.text = selectedDate.toLocaleDateString(Qt.locale(), Locale.ShortFormat)
+        }
+    }
 }

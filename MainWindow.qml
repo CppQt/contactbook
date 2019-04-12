@@ -269,8 +269,8 @@ Window {
 
     EditRecordDialog {
         id: editRecordDialog
-        width: 200
-        height: 100
+        width: 360
+        height: 280
         title: edit ? qsTr("Edit contant") : qsTr("New contact")
 
         onAccepted: {

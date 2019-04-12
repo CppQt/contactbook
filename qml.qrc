@@ -3,8 +3,10 @@
         <file>main.qml</file>
         <file>MainWindow.qml</file>
         <file>EditRecordDialog.qml</file>
+        <file>DatePicker.qml</file>
     </qresource>
     <qresource prefix="/images">
         <file>spinner.gif</file>
+        <file>calendar.png</file>
     </qresource>
 </RCC>
