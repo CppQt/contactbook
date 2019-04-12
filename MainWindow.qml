@@ -2,7 +2,7 @@ import QtQuick 2.12
 import QtQuick.Window 2.12
 import QtQuick.Controls 2.5
 import QtQuick.Layouts 1.12
-import QtQuick.Dialogs 1.2
+import QtQuick.Dialogs 1.2 as Dialogs
 
 import data.model 1.0
 
@@ -195,11 +195,20 @@ Window {
             }
         }
 
-        RowLayout {
+        DialogButtonBox {
+            Layout.fillWidth: true
+            buttonLayout: DialogButtonBox.WinLayout
+            padding: 0
+            Button {
+                id: exitButton
+                text: qsTr("Exit")
+                DialogButtonBox.buttonRole: DialogButtonBox.Ignore
+                onClicked: Qt.quit()
+            }
             Button {
                 id: saveButton
                 text: qsTr("Save")
-                Layout.fillWidth: true
+                DialogButtonBox.buttonRole: DialogButtonBox.Save
                 onClicked: {
                     console.log("Save")
                     fileDialog.selectExisting = false
@@ -209,28 +218,22 @@ Window {
             Button {
                 id: loadButton
                 text: qsTr("Load")
-                Layout.fillWidth: true
+                DialogButtonBox.buttonRole: DialogButtonBox.Reset
                 onClicked: {
                     fileDialog.selectExisting = true
                     fileDialog.open()
                 }
             }
-            Button {
-                id: exitButton
-                text: qsTr("Exit")
-                Layout.fillWidth: true
-                onClicked: Qt.quit()
-            }
         }
     }
 
-    MessageDialog {
+    Dialogs.MessageDialog {
         id: messageDialog
-        icon: StandardIcon.Warning
-        standardButtons: StandardButton.Ok
+        icon: Dialogs.StandardIcon.Warning
+        standardButtons: Dialogs.StandardButton.Ok
     }
 
-    FileDialog {
+    Dialogs.FileDialog {
         id: fileDialog
         title: selectExisting ? qsTr("Choose file to load") : qsTr("Enter file to save")
         selectFolder: false

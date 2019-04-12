@@ -1,9 +1,10 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.5
-import QtQuick.Dialogs 1.2
+import QtQuick.Dialogs 1.2 as Dialogs
 import QtQuick.Layouts 1.12
 
-Dialog {
+Dialogs.Dialog {
+    id: dialog
     title: qsTr("Edit line")
 
     property alias firstName: firstNameInput.text
@@ -75,7 +76,31 @@ Dialog {
             selectByMouse: true
             inputMethodHints: Qt.ImhEmailCharactersOnly
         }
+        DialogButtonBox {
+            Layout.column: 1
+            Layout.row: 4
+            Layout.columnSpan: 2
+            buttonLayout: DialogButtonBox.WinLayout
+            padding: 0
+            Button {
+                id: saveButton
+                text: qsTr("Ok")
+                DialogButtonBox.buttonRole: DialogButtonBox.AcceptRole
+            }
+            Button {
+                id: loadButton
+                text: qsTr("Cancel")
+                DialogButtonBox.buttonRole: DialogButtonBox.RejectRole
+            }
+            onAccepted: {
+                dialog.accepted()
+                dialog.close()
+            }
+            onRejected: {
+                dialog.rejected()
+                dialog.close()
+            }
+        }
     }
-
-    standardButtons: StandardButton.Ok | StandardButton.Cancel
+    standardButtons: DialogButtonBox.NoButton
 }
